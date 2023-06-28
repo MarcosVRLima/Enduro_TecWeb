@@ -11,12 +11,13 @@ html{
 }
 
 body{
-    background-color: midnightblue;
+    background-color:steelblue;
     color: white;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 
     margin: 0;
     height: 100%;
+    width: 100%;
 }
 
 .content{
@@ -31,4 +32,18 @@ main{
     color: black;
     width: 80%;
     height: 80%;
+    position: relative;
+}
+
+.carDiv{
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    transition: left 0.05s linear;
+}
+
+
+.car{
+    height: 125px;
 }
