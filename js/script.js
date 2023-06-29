@@ -1,90 +1,107 @@
-function newElement(tagName, className){
+// Função utilitária para criar elementos com classe
+function newElement(tagName, className) {
     const element = document.createElement(tagName);
     element.className = className;
     return element;
 }
 
-function position(element){
+// Função utilitária para obter a posição esquerda de um elemento
+function position(element) {
     return parseFloat(window.getComputedStyle(element).left);
 }
 
-function Scenario(){
-    this.element = newElement('div', 'sky');
-    this.setHeight = height => this.element.style.height = `${height}px`
-}
-
-function Car(){
-    this.element = newElement('div', 'carDiv');
-    this.elementCar = newElement('img', 'car');
-    this.elementCar.src = './img/car.png';
-    this.element.appendChild(this.elementCar);
-
-    this.step = 20;
-    this.isMovingLeft = false;
-    this.isMovingRight = false;
-}
-
-Car.prototype.limitLeft = function () {
-    return this.element.offsetWidth / 2;
-};
-  
-Car.prototype.limitRight = function () {
-    const mainElement = document.getElementsByTagName('main')[0];
-    return (mainElement.offsetWidth - (this.element.offsetWidth / 2));
-};
-
-Car.prototype.startMoving = function(event) {
-    if (event.key === 'ArrowLeft' && !this.isMovingLeft) {
-        this.isMovingLeft = true;
-        this.moveLeft();
-    } else if (event.key === 'ArrowRight' && !this.isMovingRight) {
-        this.isMovingRight = true;
-        this.moveRight();
+// Classe do cenário
+class Scenario {
+    constructor() {
+        this.element = newElement("div", "sky");
     }
-};
 
-Car.prototype.stopMoving = function(event) {
-    if (event.key === 'ArrowLeft') {
+    setHeight(height) {
+        this.element.style.height = `${height}px`;
+    }
+
+    addToScreen() {
+        document.querySelector("[screen]").appendChild(this.element);
+    }
+}
+
+// Classe do carro
+class Car {
+    constructor() {
+        this.element = newElement("div", "carDiv");
+        this.elementCar = newElement("img", "car");
+        this.elementCar.src = "./img/car.png";
+        this.element.appendChild(this.elementCar);
+
+        this.step = 20;
         this.isMovingLeft = false;
-    } else if (event.key === 'ArrowRight') {
         this.isMovingRight = false;
     }
+
+    limitLeft() {
+        return this.element.offsetWidth / 2;
+    }
+
+    limitRight() {
+        const mainElement = document.querySelector("main");
+        return mainElement.offsetWidth - this.limitLeft();
+    }
+
+    move(direction) {
+        const currentPosition = position(this.element);
+        const newPosition =
+        direction === "right"
+            ? currentPosition + this.step
+            : currentPosition - this.step;
+
+        if (newPosition >= this.limitLeft() && newPosition <= this.limitRight()) {
+            this.element.style.left = `${newPosition}px`;
+        }
+
+        if (this.isMovingLeft) {
+            requestAnimationFrame(() => this.move("left"));
+        } else if (this.isMovingRight) {
+            requestAnimationFrame(() => this.move("right"));
+        }
+    }
+    
+    addToScreen() {
+        document.querySelector("[screen]").appendChild(this.element);
+    }
 }
 
-Car.prototype.moveLeft = function() {
-    var currentPosition = position(this.element);
-    var newPosition = currentPosition - this.step;
+// Função para adicionar o cenário e o carro ao DOM
+function addScenarioAndCar() {
+    const s = new Scenario();
+    s.setHeight(200);
+    s.addToScreen();
 
-    if (newPosition >= this.limitLeft()) {
-      this.element.style.left = newPosition + 'px';
-    }
+    const car = new Car();
+    car.addToScreen();
 
-    if (this.isMovingLeft) {
-        requestAnimationFrame(() => this.moveLeft());
-    }
-};
+    document.addEventListener("keydown", function (event) {
+        if (event.key === "ArrowLeft" && !car.isMovingLeft) {
+            car.isMovingLeft = true;
+            car.move("left");
+        } else if (event.key === "ArrowRight" && !car.isMovingRight) {
+            car.isMovingRight = true;
+            car.move("right");
+        }
+    });
 
-Car.prototype.moveRight = function() {
-    var currentPosition = position(this.element);
-    var newPosition = currentPosition + this.step;
+    document.addEventListener("keyup", function (event) {
+        if (event.key === "ArrowLeft") {
+            car.isMovingLeft = false;
+        } else if (event.key === "ArrowRight") {
+            car.isMovingRight = false;
+        }
+    });
+}
 
-    if (newPosition <= this.limitRight()) {
-        this.element.style.left = newPosition + 'px';
-    }
+// Função para iniciar a aplicação
+function initializeApp() {
+    addScenarioAndCar();
+}
 
-    if (this.isMovingRight) {
-        requestAnimationFrame(() => this.moveRight());
-    }
-};
-
-
-
-const s = new Scenario();
-s.setHeight(200);
-document.querySelector('[screen]').appendChild(s.element);
-
-const car = new Car();
-document.querySelector('[screen]').appendChild(car.element);
-
-document.addEventListener('keydown', car.startMoving.bind(car));
-document.addEventListener('keyup', car.stopMoving.bind(car));
+// Aguarda o carregamento do DOM para iniciar a aplicação
+document.addEventListener("DOMContentLoaded", initializeApp);
