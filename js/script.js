@@ -19,10 +19,19 @@ function Car(){
     this.elementCar.src = './img/car.png';
     this.element.appendChild(this.elementCar);
 
-    this.step = 10;
+    this.step = 20;
     this.isMovingLeft = false;
     this.isMovingRight = false;
 }
+
+Car.prototype.limitLeft = function () {
+    return this.element.offsetWidth / 2;
+};
+  
+Car.prototype.limitRight = function () {
+    const mainElement = document.getElementsByTagName('main')[0];
+    return (mainElement.offsetWidth - (this.element.offsetWidth / 2));
+};
 
 Car.prototype.startMoving = function(event) {
     if (event.key === 'ArrowLeft' && !this.isMovingLeft) {
@@ -44,7 +53,11 @@ Car.prototype.stopMoving = function(event) {
 
 Car.prototype.moveLeft = function() {
     var currentPosition = position(this.element);
-    this.element.style.left = currentPosition - this.step + 'px';
+    var newPosition = currentPosition - this.step;
+
+    if (newPosition >= this.limitLeft()) {
+      this.element.style.left = newPosition + 'px';
+    }
 
     if (this.isMovingLeft) {
         requestAnimationFrame(() => this.moveLeft());
@@ -53,7 +66,11 @@ Car.prototype.moveLeft = function() {
 
 Car.prototype.moveRight = function() {
     var currentPosition = position(this.element);
-    this.element.style.left = currentPosition + this.step + 'px';
+    var newPosition = currentPosition + this.step;
+
+    if (newPosition <= this.limitRight()) {
+        this.element.style.left = newPosition + 'px';
+    }
 
     if (this.isMovingRight) {
         requestAnimationFrame(() => this.moveRight());

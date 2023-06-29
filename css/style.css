@@ -30,12 +30,17 @@ body{
 main{
     background-color: white;
     color: black;
-    width: 80%;
+    width: 70%;
     height: 80%;
     position: relative;
 }
 
+.sky{
+    background-color: royalblue;
+}
+
 .carDiv{
+    height: 130px;
     position: absolute;
     bottom: 0;
     left: 50%;
@@ -45,5 +50,5 @@ main{
 
 
 .car{
-    height: 125px;
+    height: 130px;
 }
