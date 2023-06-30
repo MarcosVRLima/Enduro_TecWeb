@@ -27,8 +27,8 @@ class Scenario {
 
 class Cloud { 
     constructor(numberCloud, position) { 
-        this.element = newElement("div", "cloud");
-        this.elementCloud = newElement("img", `cloud${numberCloud}`);
+        this.element = newElement("div", `cloud cloud${numberCloud}`);
+        this.elementCloud = newElement("img", "");
         this.elementCloud.src = `./img/cloud${numberCloud}.png`;
         this.element.style.left = `${position}px`;
         this.element.appendChild(this.elementCloud);
@@ -41,14 +41,14 @@ class Clouds {
         this.numberClouds = numberClouds;
         this.setClouds(this.numberClouds);
         
-        this.step = 15;
+        this.step = 30;
         this.isMovingLeft = false;
         this.isMovingRight = false;
     }
 
     setClouds() {
         for(var i = 0; i < this.numberClouds; i++) {
-            const cloud = new Cloud(i+1, (300*i));
+            const cloud = new Cloud(i+1, (350*(i-1)));
             this.element.appendChild(cloud.element);
         }
     }
@@ -62,20 +62,19 @@ class Clouds {
                     ? currentPosition + this.step
                     : currentPosition - this.step;
 
-            /* Verifica se a nuvem atingiu a posição de retorno
-            if (direction === "right" && newPosition > 1500) {
-                newPosition = -300;
-            } else if (direction === "left" && newPosition < -300) {
-                newPosition = 1500;
+            /*//Verifica se a nuvem atingiu a posição de retorno
+            if (direction === "right" && newPosition > (350*(this.numberClouds-1))) {
+                console.log('saiu cloud' + i + ' na ' + direction);
+            } else if (direction === "left" && newPosition < -350) {
+                //newPosition = 1500;
             }*/
 
             cloudElement.style.left = `${newPosition}px`;
         }
 
-        if (this.isMovingLeft) {
-            requestAnimationFrame(() => this.move("left"));
-        } else if (this.isMovingRight) {
-            requestAnimationFrame(() => this.move("right"));
+        // Chama a próxima atualização de posição no próximo quadro da animação
+        if ((this.isMovingLeft && direction === "left") || (this.isMovingRight && direction === 'right')) {
+            requestAnimationFrame(() => this.move(direction));
         }
     }
 
@@ -117,10 +116,8 @@ class Car {
             this.element.style.left = `${newPosition}px`;
         }
 
-        if (this.isMovingLeft) {
-            requestAnimationFrame(() => this.move("left"));
-        } else if (this.isMovingRight) {
-            requestAnimationFrame(() => this.move("right"));
+        if ((this.isMovingLeft && direction === "left") || (this.isMovingRight && direction === 'right')) {
+            requestAnimationFrame(() => this.move(direction));
         }
     }
     
@@ -132,7 +129,7 @@ class Car {
 // Função para adicionar o cenário e o carro ao DOM
 function addScenarioAndCar() {
     const s = new Scenario();
-    s.setHeight(200);
+    s.setHeight(150);
     s.addToScreen();
 
     const car = new Car();
