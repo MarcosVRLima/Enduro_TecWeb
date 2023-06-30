@@ -25,6 +25,65 @@ class Scenario {
     }
 }
 
+class Cloud { 
+    constructor(numberCloud, position) { 
+        this.element = newElement("div", "cloud");
+        this.elementCloud = newElement("img", `cloud${numberCloud}`);
+        this.elementCloud.src = `./img/cloud${numberCloud}.png`;
+        this.element.style.left = `${position}px`;
+        this.element.appendChild(this.elementCloud);
+    }
+}
+
+class Clouds {
+    constructor(numberClouds) {
+        this.element = newElement("div", "cloud-container");
+        this.numberClouds = numberClouds;
+        this.setClouds(this.numberClouds);
+        
+        this.step = 15;
+        this.isMovingLeft = false;
+        this.isMovingRight = false;
+    }
+
+    setClouds() {
+        for(var i = 0; i < this.numberClouds; i++) {
+            const cloud = new Cloud(i+1, (300*i));
+            this.element.appendChild(cloud.element);
+        }
+    }
+
+    move(direction) {
+        for(var i = 0; i < this.numberClouds; i++){
+            const cloudElement = this.element.children[i];
+            const currentPosition = position(cloudElement);
+            let newPosition =
+                direction === "right"
+                    ? currentPosition + this.step
+                    : currentPosition - this.step;
+
+            /* Verifica se a nuvem atingiu a posição de retorno
+            if (direction === "right" && newPosition > 1500) {
+                newPosition = -300;
+            } else if (direction === "left" && newPosition < -300) {
+                newPosition = 1500;
+            }*/
+
+            cloudElement.style.left = `${newPosition}px`;
+        }
+
+        if (this.isMovingLeft) {
+            requestAnimationFrame(() => this.move("left"));
+        } else if (this.isMovingRight) {
+            requestAnimationFrame(() => this.move("right"));
+        }
+    }
+
+    addToScreen() {
+        document.querySelector('.sky').appendChild(this.element);
+    }
+}
+
 // Classe do carro
 class Car {
     constructor() {
@@ -79,21 +138,32 @@ function addScenarioAndCar() {
     const car = new Car();
     car.addToScreen();
 
+    const clouds = new Clouds(6);
+    clouds.addToScreen();
+
     document.addEventListener("keydown", function (event) {
         if (event.key === "ArrowLeft" && !car.isMovingLeft) {
             car.isMovingLeft = true;
             car.move("left");
+
+            clouds.isMovingRight = true;
+            clouds.move("right");
         } else if (event.key === "ArrowRight" && !car.isMovingRight) {
             car.isMovingRight = true;
             car.move("right");
+
+            clouds.isMovingLeft = true;
+            clouds.move("left");
         }
     });
 
     document.addEventListener("keyup", function (event) {
         if (event.key === "ArrowLeft") {
             car.isMovingLeft = false;
+            clouds.isMovingRight = false;
         } else if (event.key === "ArrowRight") {
             car.isMovingRight = false;
+            clouds.isMovingLeft = false;
         }
     });
 }
