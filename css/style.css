@@ -13,7 +13,7 @@ html {
 body {
     background-color:steelblue;
     color: white;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 
     margin: 0;
     height: 100%;
@@ -28,10 +28,10 @@ body {
 }
 
 main {
-    background-color: white;
+    background-image: linear-gradient(to top, green, darkgreen);
     color: black;
     width: 1000px;
-    height: 700px;
+    height: 600px;
     position: relative;
 }
 
@@ -39,13 +39,34 @@ main {
     background-color: royalblue;
 }
 
+.divFloor {
+    height: 85%;
+}
+
 .divRoad {
     clip-path: polygon(45% 0, 55% 0, 100% 100%, 0% 100%);
     background-color: black;
-    height: 85%;
+    height: 100%;
     width: 50%;
-    position: absolute;
     left: 25%;
+    position: relative;
+}
+
+.road-lines {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 2px;
+}
+  
+.road-line {
+    position: absolute;
+    background-color: white;
+    width: 5px;
+    height: 20px;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 .cloud-container {
@@ -87,7 +108,16 @@ main {
     transition: left 0.05s linear;
 }
 
-
 .car {
     height: 130px;
+}
+
+.obstacleCar {
+    display: flex;
+    position: absolute;
+}
+
+.obstacleCar img {
+    height: 100px;
+    overflow: hidden;
 }

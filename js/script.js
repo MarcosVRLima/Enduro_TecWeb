@@ -11,7 +11,7 @@ function position(element) {
 }
 
 // Classe do cenário
-class Scenario {
+class Sky {
     constructor() {
         this.element = newElement("div", "sky");
     }
@@ -41,7 +41,7 @@ class Clouds {
         this.numberClouds = numberClouds;
         this.setClouds(this.numberClouds);
         
-        this.step = 30;
+        this.step = 10;
         this.isMovingLeft = false;
         this.isMovingRight = false;
     }
@@ -83,16 +83,59 @@ class Clouds {
     }
 }
 
+class Floor {
+    constructor() {
+        this.element = newElement('div', 'divFloor');
+    }
+    
+    addToScreen() {
+        document.querySelector('[screen]').appendChild(this.element);
+    }
+}
+
 class Road {
     constructor() {
         this.element = newElement('div', 'divRoad');
-        /*this.elementRoad = newElement('img', 'road');
-        this.elementRoad.src = ('./img/estrada.jpeg')
-        this.element.appendChild(this.elementRoad);*/
     }
 
     addToScreen() {
-        document.querySelector('[screen]').appendChild(this.element);
+        document.querySelector('.divFloor').appendChild(this.element);
+    }
+}
+
+// Classe das linhas da estrada
+class RoadLines {
+    constructor() {
+        this.lines = [];
+        this.speed = 1;
+        this.lineSpacing = 2;
+        this.createLines();
+        this.moveLines();
+    }
+    
+    createLines() {
+        const divRoad = document.querySelector(".divRoad");
+        for (let i = 0; i < 5; i++) {
+            const line = newElement("div", "road-line");
+            line.style.top = `${-this.lineSpacing * i * 50}px`;
+            divRoad.appendChild(line); // Adiciona ao contêiner .divRoad
+            this.lines.push(line);
+        }
+    }
+    
+    moveLines() {
+        setInterval(() => {
+            for (let i = 0; i < this.lines.length; i++) {
+                const line = this.lines[i];
+                const currentTop = parseFloat(line.style.top);
+                const newTop = currentTop + this.speed;
+                if (newTop > line.parentElement.offsetHeight) {
+                    line.style.top = `${-this.lineSpacing}px`;
+                } else {
+                    line.style.top = `${newTop}px`;
+                }
+            }
+        }, 15);
     }
 }
 
@@ -135,24 +178,69 @@ class Car {
     }
     
     addToScreen() {
-        document.querySelector("[screen]").appendChild(this.element);
+        document.querySelector(".divFloor").appendChild(this.element);
+        this.element.style.left = position(this.element) + "px";
+    }
+}
+
+class ObstacleCar {
+    constructor() {
+        this.element = newElement("div", "obstacleCar");
+        this.elementCar = newElement("img", "car");
+        this.elementCar.src = "./img/car2.png";
+        this.element.appendChild(this.elementCar);
+
+        this.speed = 15;
+    }
+
+    addToScreen() {
+        document.querySelector(".divFloor").appendChild(this.element);
     }
 }
 
 // Função para adicionar o cenário e o carro ao DOM
-function addScenarioAndCar() {
-    const s = new Scenario();
+function addScenario() {
+    const s = new Sky();
     s.setHeight(15);
     s.addToScreen();
 
+    const f = new Floor();
+    f.addToScreen();
+
     const road = new Road();
     road.addToScreen();
+
+    const roadLines = new RoadLines();
+
+    const obstacleCar = new ObstacleCar();
+    obstacleCar.addToScreen();
 
     const car = new Car();
     car.addToScreen();
 
     const clouds = new Clouds(6);
     clouds.addToScreen();
+
+    setInterval(function() {
+        if(car.element.style.left <= "300px" || car.element.style.left >= "700px") {
+            roadLines.speed = (roadLines.speed > 2) ? (Math.ceil(roadLines.speed * 10)/10) - 0.75 : 2;
+            car.step = (car.step > 10) ? car.step - 3 : 10;
+        } else {
+            roadLines.speed = (roadLines.speed < 10) ? (Math.ceil(roadLines.speed * 10)/10) + 0.01 : 10;
+            car.step = (car.step < 20) ? car.step + 2 : 20;
+        }
+
+        
+    }, 100);
+
+    setInterval(function() {
+        obstacleCar.element.style.top = `${obstacleCar.speed}%`;
+        obstacleCar.element.style.left = `${50 + (obstacleCar.speed / 25)}%`;
+        obstacleCar.elementCar.style.height = `${obstacleCar.speed * 1.7}px`;
+        
+        obstacleCar.speed = (obstacleCar.speed < 81) ? obstacleCar.speed + (roadLines.speed / 25) : 15;
+
+    }, 15);
 
     document.addEventListener("keydown", function (event) {
         if (event.key === "ArrowLeft" && !car.isMovingLeft) {
@@ -183,7 +271,8 @@ function addScenarioAndCar() {
 
 // Função para iniciar a aplicação
 function initializeApp() {
-    addScenarioAndCar();
+    alert('Enduro');
+    addScenario();
 }
 
 // Aguarda o carregamento do DOM para iniciar a aplicação
