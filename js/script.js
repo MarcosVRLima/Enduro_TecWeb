@@ -17,7 +17,7 @@ class Scenario {
     }
 
     setHeight(height) {
-        this.element.style.height = `${height}px`;
+        this.element.style.height = `${height}%`;
     }
 
     addToScreen() {
@@ -83,6 +83,19 @@ class Clouds {
     }
 }
 
+class Road {
+    constructor() {
+        this.element = newElement('div', 'divRoad');
+        /*this.elementRoad = newElement('img', 'road');
+        this.elementRoad.src = ('./img/estrada.jpeg')
+        this.element.appendChild(this.elementRoad);*/
+    }
+
+    addToScreen() {
+        document.querySelector('[screen]').appendChild(this.element);
+    }
+}
+
 // Classe do carro
 class Car {
     constructor() {
@@ -129,8 +142,11 @@ class Car {
 // Função para adicionar o cenário e o carro ao DOM
 function addScenarioAndCar() {
     const s = new Scenario();
-    s.setHeight(150);
+    s.setHeight(15);
     s.addToScreen();
+
+    const road = new Road();
+    road.addToScreen();
 
     const car = new Car();
     car.addToScreen();

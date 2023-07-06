@@ -39,6 +39,15 @@ main {
     background-color: royalblue;
 }
 
+.divRoad {
+    clip-path: polygon(45% 0, 55% 0, 100% 100%, 0% 100%);
+    background-color: black;
+    height: 85%;
+    width: 50%;
+    position: absolute;
+    left: 25%;
+}
+
 .cloud-container {
     position: relative;
     width: 100%;
