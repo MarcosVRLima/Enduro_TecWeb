@@ -62,13 +62,6 @@ class Clouds {
                     ? currentPosition + this.step
                     : currentPosition - this.step;
 
-            /*//Verifica se a nuvem atingiu a posição de retorno
-            if (direction === "right" && newPosition > (350*(this.numberClouds-1))) {
-                console.log('saiu cloud' + i + ' na ' + direction);
-            } else if (direction === "left" && newPosition < -350) {
-                //newPosition = 1500;
-            }*/
-
             cloudElement.style.left = `${newPosition}px`;
         }
 
@@ -262,14 +255,13 @@ function addScenario() {
             //clearInterval(temporizador) 
         } 
 
-        if(!obstacleCar.isColisioned) {
-            obstacleCar.element.style.top = `${obstacleCar.speed}%`;
-            obstacleCar.element.style.left = `${50 + (obstacleCar.speed / 25)}%`;
-            obstacleCar.elementCar.style.height = `${obstacleCar.speed * 1.4}px`;
-        } else {
-            obstacleCar.element.style.top = `${-(obstacleCar.speed)}%`;
-            obstacleCar.element.style.left = `${50 + (obstacleCar.speed / 25)}%`;
-            obstacleCar.elementCar.style.height = `${obstacleCar.speed * 1.7}px`;
+        obstacleCar.element.style.top = `${obstacleCar.speed}%`;
+        obstacleCar.element.style.left = `${50 + (obstacleCar.speed / 25)}%`;
+        obstacleCar.elementCar.style.height = `${obstacleCar.speed * 1.4}px`;
+
+        if(obstacleCar.isColisioned) {
+            obstacleCar.speed -= 1;
+            obstacleCar.isColisioned = false;
         }
         
         obstacleCar.speed = (obstacleCar.speed < 81) ? obstacleCar.speed + (roadLines.speed / 25) : 15;
