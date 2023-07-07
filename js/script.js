@@ -176,6 +176,16 @@ class Car {
             requestAnimationFrame(() => this.move(direction));
         }
     }
+
+    crashed(obstacle) {
+        let colidiu = false
+    
+        if (!colidiu) {
+            colidiu = estaoSobrepostos(this.element, obstacle.element)
+        }
+    
+        return colidiu
+    }
     
     addToScreen() {
         document.querySelector(".divFloor").appendChild(this.element);
@@ -189,7 +199,7 @@ class ObstacleCar {
         this.elementCar = newElement("img", "car");
         this.elementCar.src = "./img/car2.png";
         this.element.appendChild(this.elementCar);
-
+        this.isColisioned = false
         this.speed = 15;
     }
 
@@ -198,8 +208,20 @@ class ObstacleCar {
     }
 }
 
+function estaoSobrepostos(elementoA, elementoB) {
+
+    const a = elementoA.getBoundingClientRect()
+    const b = elementoB.getBoundingClientRect()
+    const horizontal = a.left + a.width >= b.left && b.left + b.width >= a.left
+    const vertical = a.top + a.height >= b.top && b.top + b.height >= a.top
+
+    return horizontal && vertical
+}
+
+
 // Função para adicionar o cenário e o carro ao DOM
 function addScenario() {
+    tempo = 0;
     const s = new Sky();
     s.setHeight(15);
     s.addToScreen();
@@ -229,16 +251,29 @@ function addScenario() {
             roadLines.speed = (roadLines.speed < 10) ? (Math.ceil(roadLines.speed * 10)/10) + 0.01 : 10;
             car.step = (car.step < 20) ? car.step + 2 : 20;
         }
-
-        
     }, 100);
 
     setInterval(function() {
-        obstacleCar.element.style.top = `${obstacleCar.speed}%`;
-        obstacleCar.element.style.left = `${50 + (obstacleCar.speed / 25)}%`;
-        obstacleCar.elementCar.style.height = `${obstacleCar.speed * 1.7}px`;
+        if(car.crashed(obstacleCar)){
+            console.log("bateu")
+            obstacleCar.isColisioned = true
+            roadLines.speed = (roadLines.speed > 2) ? (Math.ceil(roadLines.speed * 10)/10) - 0.75 : 2;
+            car.step = (car.step > 10) ? car.step - 3 : 10;
+            //clearInterval(temporizador) 
+        } 
+
+        if(!obstacleCar.isColisioned) {
+            obstacleCar.element.style.top = `${obstacleCar.speed}%`;
+            obstacleCar.element.style.left = `${50 + (obstacleCar.speed / 25)}%`;
+            obstacleCar.elementCar.style.height = `${obstacleCar.speed * 1.4}px`;
+        } else {
+            obstacleCar.element.style.top = `${-(obstacleCar.speed)}%`;
+            obstacleCar.element.style.left = `${50 + (obstacleCar.speed / 25)}%`;
+            obstacleCar.elementCar.style.height = `${obstacleCar.speed * 1.7}px`;
+        }
         
         obstacleCar.speed = (obstacleCar.speed < 81) ? obstacleCar.speed + (roadLines.speed / 25) : 15;
+
 
     }, 15);
 
@@ -271,7 +306,7 @@ function addScenario() {
 
 // Função para iniciar a aplicação
 function initializeApp() {
-    alert('Enduro');
+    //alert('Enduro');
     addScenario();
 }
 

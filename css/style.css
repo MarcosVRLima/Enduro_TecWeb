@@ -100,7 +100,7 @@ main {
 }
 
 .carDiv {
-    height: 130px;
+    height: 100px;
     position: absolute;
     bottom: 0;
     left: 50%;
@@ -109,7 +109,7 @@ main {
 }
 
 .car {
-    height: 130px;
+    height: 100px;
 }
 
 .obstacleCar {
