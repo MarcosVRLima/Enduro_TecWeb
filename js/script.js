@@ -1,19 +1,23 @@
-// Função utilitária para criar elementos com classe
-function newElement(tagName, className) {
-    const element = document.createElement(tagName);
-    element.className = className;
-    return element;
-}
+// Classe que contém as funções de utilidades
+class Utils {
+    // Função utilitária para criar elementos com classe
+    newElement(tagName, className) {
+        const element = document.createElement(tagName);
+        element.className = className;
+        return element;
+    }
 
-// Função utilitária para obter a posição esquerda de um elemento
-function position(element) {
-    return parseFloat(window.getComputedStyle(element).left);
+    // Função utilitária para obter a posição esquerda de um elemento
+    position(element) {
+        return parseFloat(window.getComputedStyle(element).left);
+    }
 }
+const utils = new Utils();
 
 // Classe do cenário
 class Sky {
     constructor() {
-        this.element = newElement("div", "sky");
+        this.element = utils.newElement("div", "sky");
     }
 
     setHeight(height) {
@@ -24,20 +28,22 @@ class Sky {
         document.querySelector("[screen]").appendChild(this.element);
     }
 }
-
+const sky = new Sky();
+// Classe da nuvem
 class Cloud { 
     constructor(numberCloud, position) { 
-        this.element = newElement("div", `cloud cloud${numberCloud}`);
-        this.elementCloud = newElement("img", "");
+        this.element = utils.newElement("div", `cloud cloud${numberCloud}`);
+        this.elementCloud = utils.newElement("img", "");
         this.elementCloud.src = `./img/cloud${numberCloud}.png`;
         this.element.style.left = `${position}px`;
         this.element.appendChild(this.elementCloud);
     }
 }
 
+// Classe das nuvens
 class Clouds {
     constructor(numberClouds) {
-        this.element = newElement("div", "cloud-container");
+        this.element = utils.newElement("div", "cloud-container");
         this.numberClouds = numberClouds;
         this.setClouds(this.numberClouds);
         
@@ -56,7 +62,7 @@ class Clouds {
     move(direction) {
         for(var i = 0; i < this.numberClouds; i++){
             const cloudElement = this.element.children[i];
-            const currentPosition = position(cloudElement);
+            const currentPosition = utils.position(cloudElement);
             let newPosition =
                 direction === "right"
                     ? currentPosition + this.step
@@ -75,26 +81,31 @@ class Clouds {
         document.querySelector('.sky').appendChild(this.element);
     }
 }
+const clouds = new Clouds(6);
 
+// Classe do chão
 class Floor {
     constructor() {
-        this.element = newElement('div', 'divFloor');
+        this.element = utils.newElement('div', 'divFloor');
     }
     
     addToScreen() {
         document.querySelector('[screen]').appendChild(this.element);
     }
 }
+const floor = new Floor();
 
+// Classe da estrada
 class Road {
     constructor() {
-        this.element = newElement('div', 'divRoad');
+        this.element = utils.newElement('div', 'divRoad');
     }
 
     addToScreen() {
         document.querySelector('.divFloor').appendChild(this.element);
     }
 }
+const road = new Road();
 
 // Classe das linhas da estrada
 class RoadLines {
@@ -102,14 +113,12 @@ class RoadLines {
         this.lines = [];
         this.speed = 1;
         this.lineSpacing = 2;
-        this.createLines();
-        this.moveLines();
     }
     
     createLines() {
         const divRoad = document.querySelector(".divRoad");
         for (let i = 0; i < 5; i++) {
-            const line = newElement("div", "road-line");
+            const line = utils.newElement("div", "road-line");
             line.style.top = `${-this.lineSpacing * i * 50}px`;
             divRoad.appendChild(line); // Adiciona ao contêiner .divRoad
             this.lines.push(line);
@@ -130,13 +139,19 @@ class RoadLines {
             }
         }, 15);
     }
+
+    addToScreen() {
+        this.createLines();
+        this.moveLines();
+    }
 }
+const roadlines = new RoadLines();
 
 // Classe do carro
 class Car {
     constructor() {
-        this.element = newElement("div", "carDiv");
-        this.elementCar = newElement("img", "car");
+        this.element = utils.newElement("div", "carDiv");
+        this.elementCar = utils.newElement("img", "car");
         this.elementCar.src = "./img/car.png";
         this.element.appendChild(this.elementCar);
 
@@ -155,7 +170,7 @@ class Car {
     }
 
     move(direction) {
-        const currentPosition = position(this.element);
+        const currentPosition = utils.position(this.element);
         const newPosition =
         direction === "right"
             ? currentPosition + this.step
@@ -174,7 +189,7 @@ class Car {
         let colidiu = false
     
         if (!colidiu) {
-            colidiu = estaoSobrepostos(this.element, obstacle.element)
+            colidiu = areSuperimposed(this.element, obstacle.element)
         }
     
         return colidiu
@@ -182,14 +197,16 @@ class Car {
     
     addToScreen() {
         document.querySelector(".divFloor").appendChild(this.element);
-        this.element.style.left = position(this.element) + "px";
+        this.element.style.left = utils.position(this.element) + "px";
     }
 }
+const car = new Car();
 
-class ObstacleCar {
+// Classe dos obstáculos
+class Obstacle {
     constructor() {
-        this.element = newElement("div", "obstacleCar");
-        this.elementCar = newElement("img", "car");
+        this.element = utils.newElement("div", "obstacleCar");
+        this.elementCar = utils.newElement("img", "car");
         this.elementCar.src = "./img/car2.png";
         this.element.appendChild(this.elementCar);
         this.isColisioned = false
@@ -200,43 +217,22 @@ class ObstacleCar {
         document.querySelector(".divFloor").appendChild(this.element);
     }
 }
+const obstacle = new Obstacle();
 
-function estaoSobrepostos(elementoA, elementoB) {
+// Função que valida se dois elementos estão sobrepostos
+function areSuperimposed(elementA, elementB) {
 
-    const a = elementoA.getBoundingClientRect()
-    const b = elementoB.getBoundingClientRect()
+    const a = elementA.getBoundingClientRect()
+    const b = elementB.getBoundingClientRect()
     const horizontal = a.left + a.width >= b.left && b.left + b.width >= a.left
     const vertical = a.top + a.height >= b.top && b.top + b.height >= a.top
 
     return horizontal && vertical
 }
 
-
-// Função para adicionar o cenário e o carro ao DOM
-function addScenario() {
-    tempo = 0;
-    const s = new Sky();
-    s.setHeight(15);
-    s.addToScreen();
-
-    const f = new Floor();
-    f.addToScreen();
-
-    const road = new Road();
-    road.addToScreen();
-
-    const roadLines = new RoadLines();
-
-    const obstacleCar = new ObstacleCar();
-    obstacleCar.addToScreen();
-
-    const car = new Car();
-    car.addToScreen();
-
-    const clouds = new Clouds(6);
-    clouds.addToScreen();
-
-    setInterval(function() {
+// Função que altera a velocidade das linhas quando o carro está na pista ou fora dela
+function changeSpeedCar(car, roadLines) {
+    setInterval(() => {
         if(car.element.style.left <= "300px" || car.element.style.left >= "700px") {
             roadLines.speed = (roadLines.speed > 2) ? (Math.ceil(roadLines.speed * 10)/10) - 0.75 : 2;
             car.step = (car.step > 10) ? car.step - 3 : 10;
@@ -245,30 +241,39 @@ function addScenario() {
             car.step = (car.step < 20) ? car.step + 2 : 20;
         }
     }, 100);
+}
 
-    setInterval(function() {
+// Função que valida se ocorreu uma colisão
+function isCrashed(car, obstacleCar, roadLines) {
+    setInterval(() => {
         if(car.crashed(obstacleCar)){
             console.log("bateu")
             obstacleCar.isColisioned = true
             roadLines.speed = (roadLines.speed > 2) ? (Math.ceil(roadLines.speed * 10)/10) - 0.75 : 2;
             car.step = (car.step > 10) ? car.step - 3 : 10;
-            //clearInterval(temporizador) 
         } 
 
+        if(obstacleCar.isColisioned) {
+            obstacleCar.speed -= 5;
+            obstacleCar.isColisioned = false;
+        }
+        
+    }, 15);
+}
+
+// Função que insere obstáculos na pista
+function putObstacles(obstacleCar, roadLines) {
+    setInterval(() => {
         obstacleCar.element.style.top = `${obstacleCar.speed}%`;
         obstacleCar.element.style.left = `${50 + (obstacleCar.speed / 25)}%`;
         obstacleCar.elementCar.style.height = `${obstacleCar.speed * 1.4}px`;
 
-        if(obstacleCar.isColisioned) {
-            obstacleCar.speed -= 1;
-            obstacleCar.isColisioned = false;
-        }
-        
         obstacleCar.speed = (obstacleCar.speed < 81) ? obstacleCar.speed + (roadLines.speed / 25) : 15;
-
-
     }, 15);
+}
 
+// Função que captura os eventos das teclas mapeadas
+function captureKeyEvents(car, clouds) {
     document.addEventListener("keydown", function (event) {
         if (event.key === "ArrowLeft" && !car.isMovingLeft) {
             car.isMovingLeft = true;
@@ -296,11 +301,31 @@ function addScenario() {
     });
 }
 
-// Função para iniciar a aplicação
-function initializeApp() {
-    //alert('Enduro');
-    addScenario();
+// Função que inicia os eventos do jogo
+function gameEvents(sky, clouds, floor, road, roadLines, obstacle, car) {
+    changeSpeedCar(car, roadLines)
+    putObstacles(obstacle, roadLines)
+    isCrashed(car, obstacle, roadLines)
+    captureKeyEvents(car, clouds)
+}
+
+// Função para adicionar o cenário e o carro ao DOM
+function buildScenario(sky, clouds, floor, road, roadLines, obstacle, car) {
+    sky.setHeight(15);
+    sky.addToScreen();
+    floor.addToScreen();
+    road.addToScreen();
+    roadLines.addToScreen();
+    obstacle.addToScreen();
+    car.addToScreen();
+    clouds.addToScreen();
+}
+
+//Função que inicia as entidades e o jogo
+function initGame() {
+    buildScenario(sky,clouds,floor,road,roadlines,obstacle,car)
+    gameEvents(sky,clouds,floor,road,roadlines,obstacle,car)
 }
 
 // Aguarda o carregamento do DOM para iniciar a aplicação
-document.addEventListener("DOMContentLoaded", initializeApp);
+document.addEventListener("DOMContentLoaded", initGame());
