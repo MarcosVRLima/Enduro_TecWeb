@@ -8,6 +8,7 @@ class Utils {
             ['#000D65', 'black', 'linear-gradient(to top, #000A4B, #00062E)'], //night
             ['#aaf', '#D3D3D1', 'linear-gradient(to top, white, #D3D3D3)']  //snow
         ]
+        this.t = 0;
     }
     // Função utilitária para criar elementos com classe
     newElement(tagName, className) {
@@ -136,7 +137,7 @@ class RoadLines {
     }
     
     moveLines() {
-        setInterval(() => {
+        utils.t = setInterval(() => {
             for (let i = 0; i < this.lines.length; i++) {
                 const line = this.lines[i];
                 const currentTop = parseFloat(line.style.top);
@@ -230,6 +231,49 @@ class Obstacle {
 }
 const obstacle = new Obstacle();
 
+// Classe do placar
+class Scoreboard {
+    constructor() {
+        this.position = 10;
+        this.lap = 1;
+        // this.auxlap = 1;
+        this.distance = 0;
+        this.element = utils.newElement("div", "scoreboard");
+        this.printDistance = utils.newElement("div", "distance");
+        this.printLap = utils.newElement("div", "lap");
+        this.printPosition = utils.newElement("div", "position");
+    }
+    updateDistance(distance) {
+        this.distance += distance;
+        this.printDistance.innerHTML = `${Math.trunc(this.distance).toString().padStart(5, '0')}`
+    }
+    // updateLap() {
+    //     console.log("entrou")
+    //     console.log("this.distance=",this.distance)
+    //     this.auxlap += this.distance
+    //     if (Math.floor(this.auxlap) === 2) {
+    //         this.lap++;
+    //         this.auxlap = 0;
+    //     }
+    //     console.log("lap=", this.lap)
+    //     this.printLap.innerHTML = `${this.lap}`
+    // }
+    updatePosition() {
+        this.position--;
+        this.printPosition.innerHTML = `P${this.position}`
+    }
+    addToScreen() {
+        document.querySelector("[screen]").appendChild(this.element);
+        document.querySelector(".scoreboard").appendChild(this.printDistance);
+        document.querySelector(".scoreboard").appendChild(this.printLap);
+        document.querySelector(".scoreboard").appendChild(this.printPosition);
+        this.printDistance.innerHTML = `${Math.floor(this.distance).toString().padStart(5, '0')}`
+        this.printLap.innerHTML = `${this.lap}`
+        this.printPosition.innerHTML = `P${this.position}`
+    }
+}
+const scoreboard = new Scoreboard();
+
 // Função que valida se dois elementos estão sobrepostos
 function areSuperimposed(elementA, elementB) {
 
@@ -243,7 +287,7 @@ function areSuperimposed(elementA, elementB) {
 
 // Função que altera a velocidade das linhas quando o carro está na pista ou fora dela
 function changeSpeedCar(car, roadLines) {
-    setInterval(() => {
+    utils.t = setInterval(() => {
         if(car.element.style.left <= "300px" || car.element.style.left >= "700px") {
             roadLines.speed = (roadLines.speed > 2) ? (Math.ceil(roadLines.speed * 10)/10) - 0.75 : 2;
             car.step = (car.step > 10) ? car.step - 3 : 10;
@@ -256,7 +300,7 @@ function changeSpeedCar(car, roadLines) {
 
 // Função que valida se ocorreu uma colisão
 function isCrashed(car, obstacleCar, roadLines) {
-    setInterval(() => {
+    utils.t = setInterval(() => {
         if(car.crashed(obstacleCar)){
             console.log("bateu")
             obstacleCar.isColisioned = true
@@ -272,11 +316,9 @@ function isCrashed(car, obstacleCar, roadLines) {
     }, 15);
 }
 
-var i = 0
-var j = 0;
 // Função que insere obstáculos na pista
 function putObstacles(obstacleCar, roadLines) {
-    setInterval(() => {        
+    utils.t = setInterval(() => {        
         if (obstacleCar.isLeft) {
             obstacleCar.element.style.top = `${obstacleCar.speed}%`;
             obstacleCar.element.style.left = `${50 + (obstacleCar.speed / 25)}%`;
@@ -287,8 +329,7 @@ function putObstacles(obstacleCar, roadLines) {
                 obstacleCar.speed = obstacleCar.speed + (roadLines.speed / 25);
             } else {
                 obstacleCar.speed = 15;
-                i++;
-                console.log("carros= ", i)
+                scoreboard.updatePosition();
                 obstacleCar.isLeft = false;
             }
         } else {
@@ -300,14 +341,12 @@ function putObstacles(obstacleCar, roadLines) {
                 obstacleCar.speed = obstacleCar.speed + (roadLines.speed / 25);
             } else {
                 obstacleCar.speed = 15;
-                i++;
-                console.log("carros= ", i)
+                scoreboard.updatePosition();
                 obstacleCar.isLeft = true
 
             }
         }
-        j += roadLines.speed / 100;
-        console.log("distancia=", j)
+        scoreboard.updateDistance(roadLines.speed / 500);
     }, 15);
 }
 
@@ -343,16 +382,34 @@ function captureKeyEvents(car, clouds) {
 // Função que troca o cenário
 function changeScenario(){
     let k = 0;
-    setInterval(() => {
+    utils.t = setInterval(() => {
         sky.element.style.backgroundColor = utils.scenes[k][0];
         road.element.style.backgroundColor = utils.scenes[k][1];
         floor.element.style.backgroundImage = utils.scenes[k][2];
         k == 3 ? k = 0 : k++;
     }, 30000);
 }
+
+// function verifyFinal() {
+//     utils.t = setInterval(() => {
+//         scoreboard.updateLap()
+//         if(scoreboard.distance == 10) {
+//             console.log("teste")
+//             if (scoreboard.position = 1) {
+//                 alert("aaaaaaaaaaaa")
+//                 clearInterval(utils.t)
+//             } else {
+//                 alert("bbbbbbbbbbbb")
+//                 clearInterval(utils.t)
+//             }
+//         }
+//     }, 100);
+// }
+
 // Função que inicia os eventos do jogo
-function gameEvents(sky, clouds, floor, road, roadLines, obstacle, car) {
+function gameEvents(sky, clouds, floor, road, roadLines, obstacle, car, scoreboard) {
     changeScenario()
+    // verifyFinal()
     changeSpeedCar(car, roadLines)
     putObstacles(obstacle, roadLines)
     isCrashed(car, obstacle, roadLines)
@@ -360,7 +417,7 @@ function gameEvents(sky, clouds, floor, road, roadLines, obstacle, car) {
 }
 
 // Função para adicionar o cenário e o carro ao DOM
-function buildScenario(sky, clouds, floor, road, roadLines, obstacle, car) {
+function buildScenario(sky, clouds, floor, road, roadLines, obstacle, car, scoreboard) {
     sky.setHeight(15);
     sky.addToScreen();
     floor.addToScreen();
@@ -369,12 +426,13 @@ function buildScenario(sky, clouds, floor, road, roadLines, obstacle, car) {
     obstacle.addToScreen();
     car.addToScreen();
     clouds.addToScreen();
+    scoreboard.addToScreen();
 }
 
 //Função que inicia as entidades e o jogo
 function initGame() {
-    buildScenario(sky,clouds,floor,road,roadlines,obstacle,car)
-    gameEvents(sky,clouds,floor,road,roadlines,obstacle,car)
+    buildScenario(sky,clouds,floor,road,roadlines,obstacle,car, scoreboard)
+    gameEvents(sky,clouds,floor,road,roadlines,obstacle,car, scoreboard)
 }
 
 // Aguarda o carregamento do DOM para iniciar a aplicação

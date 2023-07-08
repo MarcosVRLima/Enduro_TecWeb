@@ -41,6 +41,7 @@ main {
 
 .divFloor {
     height: 85%;
+    margin-bottom: 20px;
 }
 
 .divRoad {
@@ -120,4 +121,45 @@ main {
 .obstacleCar img {
     height: 100px;
     overflow: hidden;
+}
+
+.scoreboard {
+    width: 240px;
+    height: 70px;
+    margin: 0 auto;
+    background: #922;
+    padding: 5px 20px;
+    font-family: monospace;
+    font-size: 18px;
+    font-weight: bold;
+}
+.scoreboard div {
+    float: left;
+    background: #c95;
+    height: 30px;  
+    color: #000;
+    overflow: hidden;
+}
+.distance {
+    display: flex;
+    width: 220px;
+    margin-bottom: 10px;
+    background: #000;
+    color: #c95;
+    justify-content: end;
+    padding-right: 5px;
+}
+
+.lap {
+    display: flex;
+    width: 40px;
+    margin-right: 20px;
+    justify-content: center;
+}
+
+.position {
+    display: flex;
+    width: 80px;
+    float: left;
+    justify-content: center;
 }
