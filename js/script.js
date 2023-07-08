@@ -1,5 +1,14 @@
 // Classe que contém as funções de utilidades
 class Utils {
+    constructor () {
+        this.scenes = [
+            //sky//road//sides
+            ['#FFA500', '#3B3D4B', 'linear-gradient(to top, #58C45C, green)'], //day
+            ['royalblue', '#3B3D4B', 'linear-gradient(to top, green, darkgreen)'], //afternoon 
+            ['#000D65', 'black', 'linear-gradient(to top, #000A4B, #00062E)'], //night
+            ['#aaf', '#D3D3D1', 'linear-gradient(to top, white, #D3D3D3)']  //snow
+        ]
+    }
     // Função utilitária para criar elementos com classe
     newElement(tagName, className) {
         const element = document.createElement(tagName);
@@ -10,7 +19,7 @@ class Utils {
     // Função utilitária para obter a posição esquerda de um elemento
     position(element) {
         return parseFloat(window.getComputedStyle(element).left);
-    }
+    } 
 }
 const utils = new Utils();
 
@@ -29,6 +38,7 @@ class Sky {
     }
 }
 const sky = new Sky();
+
 // Classe da nuvem
 class Cloud { 
     constructor(numberCloud, position) { 
@@ -211,6 +221,7 @@ class Obstacle {
         this.element.appendChild(this.elementCar);
         this.isColisioned = false
         this.speed = 15;
+        this.isLeft = true;
     }
 
     addToScreen() {
@@ -237,7 +248,7 @@ function changeSpeedCar(car, roadLines) {
             roadLines.speed = (roadLines.speed > 2) ? (Math.ceil(roadLines.speed * 10)/10) - 0.75 : 2;
             car.step = (car.step > 10) ? car.step - 3 : 10;
         } else {
-            roadLines.speed = (roadLines.speed < 10) ? (Math.ceil(roadLines.speed * 10)/10) + 0.01 : 10;
+            roadLines.speed = (roadLines.speed < 15) ? (Math.ceil(roadLines.speed * 10)/10) + 0.01 : 15;
             car.step = (car.step < 20) ? car.step + 2 : 20;
         }
     }, 100);
@@ -261,14 +272,42 @@ function isCrashed(car, obstacleCar, roadLines) {
     }, 15);
 }
 
+var i = 0
+var j = 0;
 // Função que insere obstáculos na pista
 function putObstacles(obstacleCar, roadLines) {
-    setInterval(() => {
-        obstacleCar.element.style.top = `${obstacleCar.speed}%`;
-        obstacleCar.element.style.left = `${50 + (obstacleCar.speed / 25)}%`;
-        obstacleCar.elementCar.style.height = `${obstacleCar.speed * 1.4}px`;
+    setInterval(() => {        
+        if (obstacleCar.isLeft) {
+            obstacleCar.element.style.top = `${obstacleCar.speed}%`;
+            obstacleCar.element.style.left = `${50 + (obstacleCar.speed / 25)}%`;
+            obstacleCar.element.style.right = "unset";
+            obstacleCar.elementCar.style.height = `${obstacleCar.speed * 1.4}px`;
+    
+            if (obstacleCar.speed < 81) {
+                obstacleCar.speed = obstacleCar.speed + (roadLines.speed / 25);
+            } else {
+                obstacleCar.speed = 15;
+                i++;
+                console.log("carros= ", i)
+                obstacleCar.isLeft = false;
+            }
+        } else {
+            obstacleCar.element.style.top = `${obstacleCar.speed}%`;
+            obstacleCar.element.style.right = `${50 + (obstacleCar.speed / 25)}%`;
+            obstacleCar.element.style.left = "unset";
+            obstacleCar.elementCar.style.height = `${obstacleCar.speed * 1.4}px`;
+            if (obstacleCar.speed < 81) {
+                obstacleCar.speed = obstacleCar.speed + (roadLines.speed / 25);
+            } else {
+                obstacleCar.speed = 15;
+                i++;
+                console.log("carros= ", i)
+                obstacleCar.isLeft = true
 
-        obstacleCar.speed = (obstacleCar.speed < 81) ? obstacleCar.speed + (roadLines.speed / 25) : 15;
+            }
+        }
+        j += roadLines.speed / 100;
+        console.log("distancia=", j)
     }, 15);
 }
 
@@ -301,8 +340,19 @@ function captureKeyEvents(car, clouds) {
     });
 }
 
+// Função que troca o cenário
+function changeScenario(){
+    let k = 0;
+    setInterval(() => {
+        sky.element.style.backgroundColor = utils.scenes[k][0];
+        road.element.style.backgroundColor = utils.scenes[k][1];
+        floor.element.style.backgroundImage = utils.scenes[k][2];
+        k == 3 ? k = 0 : k++;
+    }, 30000);
+}
 // Função que inicia os eventos do jogo
 function gameEvents(sky, clouds, floor, road, roadLines, obstacle, car) {
+    changeScenario()
     changeSpeedCar(car, roadLines)
     putObstacles(obstacle, roadLines)
     isCrashed(car, obstacle, roadLines)

@@ -28,7 +28,7 @@ body {
 }
 
 main {
-    background-image: linear-gradient(to top, green, darkgreen);
+    background-image: linear-gradient(to top, green, green);
     color: black;
     width: 1000px;
     height: 600px;
