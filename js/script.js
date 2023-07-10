@@ -247,17 +247,17 @@ class Scoreboard {
         this.distance += distance;
         this.printDistance.innerHTML = `${Math.trunc(this.distance).toString().padStart(5, '0')}`
     }
-    // updateLap() {
-    //     console.log("entrou")
-    //     console.log("this.distance=",this.distance)
-    //     this.auxlap += this.distance
-    //     if (Math.floor(this.auxlap) === 2) {
-    //         this.lap++;
-    //         this.auxlap = 0;
-    //     }
-    //     console.log("lap=", this.lap)
-    //     this.printLap.innerHTML = `${this.lap}`
-    // }
+     updateLap() {
+         console.log("entrou")
+         console.log("this.distance=",this.distance)
+         this.auxlap += this.distance
+         if (Math.floor(this.auxlap) === 2) {
+            this.lap++;
+             this.auxlap = 0;
+         }
+         console.log("lap=", this.lap)
+        this.printLap.innerHTML = `${this.lap}`
+    }
     updatePosition() {
         this.position--;
         this.printPosition.innerHTML = `P${this.position}`
@@ -292,7 +292,7 @@ function changeSpeedCar(car, roadLines) {
             roadLines.speed = (roadLines.speed > 2) ? (Math.ceil(roadLines.speed * 10)/10) - 0.75 : 2;
             car.step = (car.step > 10) ? car.step - 3 : 10;
         } else {
-            roadLines.speed = (roadLines.speed < 15) ? (Math.ceil(roadLines.speed * 10)/10) + 0.01 : 15;
+            roadLines.speed = (roadLines.speed < 20) ? (Math.ceil(roadLines.speed * 10)/10) + 0.01 : 20;
             car.step = (car.step < 20) ? car.step + 2 : 20;
         }
     }, 100);
@@ -330,7 +330,7 @@ function putObstacles(obstacleCar, roadLines) {
             } else {
                 obstacleCar.speed = 15;
                 scoreboard.updatePosition();
-                obstacleCar.isLeft = false;
+                obstacleCar.isLeft = (Math.random() < 0.75) ? false : true;
             }
         } else {
             obstacleCar.element.style.top = `${obstacleCar.speed}%`;
@@ -342,7 +342,7 @@ function putObstacles(obstacleCar, roadLines) {
             } else {
                 obstacleCar.speed = 15;
                 scoreboard.updatePosition();
-                obstacleCar.isLeft = true
+                obstacleCar.isLeft = (Math.random() < 0.75) ? false : true;
 
             }
         }
@@ -390,21 +390,21 @@ function changeScenario(){
     }, 30000);
 }
 
-// function verifyFinal() {
-//     utils.t = setInterval(() => {
-//         scoreboard.updateLap()
-//         if(scoreboard.distance == 10) {
-//             console.log("teste")
-//             if (scoreboard.position = 1) {
-//                 alert("aaaaaaaaaaaa")
-//                 clearInterval(utils.t)
-//             } else {
-//                 alert("bbbbbbbbbbbb")
-//                 clearInterval(utils.t)
-//             }
-//         }
-//     }, 100);
-// }
+ function verifyFinal() {
+     utils.t = setInterval(() => {
+         scoreboard.updateLap()
+         if(scoreboard.distance == 10) {
+             console.log("teste")
+             if (scoreboard.position = 1) {
+                 alert("aaaaaaaaaaaa")
+                 clearInterval(utils.t)
+             } else {
+                 alert("bbbbbbbbbbbb")
+                 clearInterval(utils.t)
+             }
+         }
+     }, 100);
+ }
 
 // Função que inicia os eventos do jogo
 function gameEvents(sky, clouds, floor, road, roadLines, obstacle, car, scoreboard) {
