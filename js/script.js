@@ -234,9 +234,9 @@ const obstacle = new Obstacle();
 // Classe do placar
 class Scoreboard {
     constructor() {
-        this.position = 10;
+        this.position = 50;
         this.lap = 1;
-        // this.auxlap = 1;
+        this.auxlap = 0;
         this.distance = 0;
         this.element = utils.newElement("div", "scoreboard");
         this.printDistance = utils.newElement("div", "distance");
@@ -245,17 +245,15 @@ class Scoreboard {
     }
     updateDistance(distance) {
         this.distance += distance;
-        this.printDistance.innerHTML = `${Math.trunc(this.distance).toString().padStart(5, '0')}`
+        this.auxlap += distance;
+        this.printDistance.innerHTML = `${Math.trunc(this.distance).toString().padStart(5, '0')}`;
+        this.updateLap();
     }
-     updateLap() {
-         console.log("entrou")
-         console.log("this.distance=",this.distance)
-         this.auxlap += this.distance
-         if (Math.floor(this.auxlap) === 2) {
-            this.lap++;
-             this.auxlap = 0;
-         }
-         console.log("lap=", this.lap)
+    updateLap() {
+        if (parseInt(this.auxlap) >= 100) {
+           this.lap++;
+           this.auxlap = 0;
+        }
         this.printLap.innerHTML = `${this.lap}`
     }
     updatePosition() {
@@ -286,7 +284,7 @@ function areSuperimposed(elementA, elementB) {
 }
 
 // Função que altera a velocidade das linhas quando o carro está na pista ou fora dela
-function changeSpeedCar(car, roadLines) {
+function changeSpeedCar(car, roadLines) {   
     utils.t = setInterval(() => {
         if(car.element.style.left <= "300px" || car.element.style.left >= "700px") {
             roadLines.speed = (roadLines.speed > 2) ? (Math.ceil(roadLines.speed * 10)/10) - 0.75 : 2;
@@ -302,7 +300,6 @@ function changeSpeedCar(car, roadLines) {
 function isCrashed(car, obstacleCar, roadLines) {
     utils.t = setInterval(() => {
         if(car.crashed(obstacleCar)){
-            console.log("bateu")
             obstacleCar.isColisioned = true
             roadLines.speed = (roadLines.speed > 2) ? (Math.ceil(roadLines.speed * 10)/10) - 0.75 : 2;
             car.step = (car.step > 10) ? car.step - 3 : 10;
@@ -318,35 +315,40 @@ function isCrashed(car, obstacleCar, roadLines) {
 
 // Função que insere obstáculos na pista
 function putObstacles(obstacleCar, roadLines) {
-    utils.t = setInterval(() => {        
-        if (obstacleCar.isLeft) {
-            obstacleCar.element.style.top = `${obstacleCar.speed}%`;
-            obstacleCar.element.style.left = `${50 + (obstacleCar.speed / 25)}%`;
-            obstacleCar.element.style.right = "unset";
-            obstacleCar.elementCar.style.height = `${obstacleCar.speed * 1.4}px`;
-    
-            if (obstacleCar.speed < 81) {
-                obstacleCar.speed = obstacleCar.speed + (roadLines.speed / 25);
+    utils.t = setInterval(() => {
+        if (scoreboard.position > 1) {
+            if (obstacleCar.isLeft) {
+                obstacleCar.element.style.top = `${obstacleCar.speed}%`;
+                obstacleCar.element.style.left = `${50 + (obstacleCar.speed / 25)}%`;
+                obstacleCar.element.style.right = "unset";
+                obstacleCar.elementCar.style.height = `${obstacleCar.speed * 1.4}px`;
+        
+                if (obstacleCar.speed < 81) {
+                    obstacleCar.speed = obstacleCar.speed + (roadLines.speed / 25);
+                } else {
+                    obstacleCar.speed = 15;
+                    scoreboard.updatePosition();
+                    obstacleCar.isLeft = (Math.random() < 0.75) ? false : true;
+                }
             } else {
-                obstacleCar.speed = 15;
-                scoreboard.updatePosition();
-                obstacleCar.isLeft = (Math.random() < 0.75) ? false : true;
+                obstacleCar.element.style.top = `${obstacleCar.speed}%`;
+                obstacleCar.element.style.right = `${50 + (obstacleCar.speed / 25)}%`;
+                obstacleCar.element.style.left = "unset";
+                obstacleCar.elementCar.style.height = `${obstacleCar.speed * 1.4}px`;
+                if (obstacleCar.speed < 81) {
+                    obstacleCar.speed = obstacleCar.speed + (roadLines.speed / 25);
+                } else {
+                    obstacleCar.speed = 15;
+                    scoreboard.updatePosition();
+                    obstacleCar.isLeft = (Math.random() < 0.75) ? false : true;
+
+                }
             }
         } else {
-            obstacleCar.element.style.top = `${obstacleCar.speed}%`;
-            obstacleCar.element.style.right = `${50 + (obstacleCar.speed / 25)}%`;
-            obstacleCar.element.style.left = "unset";
-            obstacleCar.elementCar.style.height = `${obstacleCar.speed * 1.4}px`;
-            if (obstacleCar.speed < 81) {
-                obstacleCar.speed = obstacleCar.speed + (roadLines.speed / 25);
-            } else {
-                obstacleCar.speed = 15;
-                scoreboard.updatePosition();
-                obstacleCar.isLeft = (Math.random() < 0.75) ? false : true;
-
-            }
-        }
-        scoreboard.updateDistance(roadLines.speed / 500);
+            obstacleCar.element.style.display = "none";
+        }        
+        scoreboard.updateDistance(roadLines.speed / 200);
+        verifyFinal()
     }, 15);
 }
 
@@ -387,29 +389,30 @@ function changeScenario(){
         road.element.style.backgroundColor = utils.scenes[k][1];
         floor.element.style.backgroundImage = utils.scenes[k][2];
         k == 3 ? k = 0 : k++;
-    }, 30000);
+    }, 15000);
 }
 
- function verifyFinal() {
-     utils.t = setInterval(() => {
-         scoreboard.updateLap()
-         if(scoreboard.distance == 10) {
-             console.log("teste")
-             if (scoreboard.position = 1) {
-                 alert("aaaaaaaaaaaa")
-                 clearInterval(utils.t)
-             } else {
-                 alert("bbbbbbbbbbbb")
-                 clearInterval(utils.t)
-             }
-         }
-     }, 100);
- }
+// Função que verifica se o jogo finalizou
+function verifyFinal() {
+    if(parseInt(scoreboard.distance) === 500) {
+        if (parseInt(scoreboard.position) === 1) {
+            console.log("VOCÊ GANHOU! :D")
+            if (alert("VOCÊ GANHOU! :D")){
+                location.reload();
+            }
+        } else {
+            console.log("VOCÊ PERDEU! :/")
+            if(alert("VOCÊ PERDEU! :/")) {
+                document.getElementsByTagName("html").innerHTML = "";
+                location.reload();
+            }
+        }
+    }
+}
 
 // Função que inicia os eventos do jogo
 function gameEvents(sky, clouds, floor, road, roadLines, obstacle, car, scoreboard) {
     changeScenario()
-    // verifyFinal()
     changeSpeedCar(car, roadLines)
     putObstacles(obstacle, roadLines)
     isCrashed(car, obstacle, roadLines)

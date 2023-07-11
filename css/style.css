@@ -28,7 +28,7 @@ body {
 }
 
 main {
-    background-image: linear-gradient(to top, green, green);
+    background-image: linear-gradient(to top, #58C45C, green);
     color: black;
     width: 1000px;
     height: 600px;
@@ -36,7 +36,7 @@ main {
 }
 
 .sky {
-    background-color: royalblue;
+    background-color: #FFA500;
 }
 
 .divFloor {
@@ -46,7 +46,7 @@ main {
 
 .divRoad {
     clip-path: polygon(45% 0, 55% 0, 100% 100%, 0% 100%);
-    background-color: black;
+    background-color: #3B3D4B;
     height: 100%;
     width: 50%;
     left: 25%;
